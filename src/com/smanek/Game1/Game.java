@@ -10,6 +10,8 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
+import com.smanek.Game1.graphics.Screen;
+
 public class Game extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
@@ -25,11 +27,14 @@ public class Game extends Canvas implements Runnable {
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB); // created an image to be rendered
 	private int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData(); // converting the image to raster and fetching each pixel in integer form (enables access to the image being rendered).
 	
+	private Screen screen;
+	
 	public Game()
 	{
 		Dimension size = new Dimension(WIDTH*scale, HEIGHT*scale);
 		setPreferredSize(size);
 		
+		screen = new Screen(WIDTH, HEIGHT);
 		frame = new JFrame();
 	}
 	
@@ -52,10 +57,18 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 		
+		screen.clear();
+		screen.render();
+		
+		// copy the pixels of the screen
+		for(int i = 0; i < pixels.length; i++)
+		{
+			pixels[i] = screen.pixels[i];
+		}
+		
 		Graphics g = bs.getDrawGraphics();
 		
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, getWidth(), getHeight());
+		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
 		
 		g.dispose(); // disposes buffer after calculation
 		bs.show(); // render the buffer that has been calculated
